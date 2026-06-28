@@ -1,0 +1,35 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { width: 280px; background: #1c1c1e; font-family: sans-serif; }
+
+.calc { padding: 16px; }
+
+.screen {
+  background: #2c2c2e;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  text-align: right;
+}
+.expr   { font-size: 13px; color: #888; min-height: 18px; }
+.result { font-size: 36px; font-weight: 500; color: #fff; word-break: break-all; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  padding: 14px 0;
+  cursor: pointer;
+}
+button:active { opacity: 0.7; }
+
+.btn-num   { background: #3a3a3c; color: #fff; }
+.btn-op    { background: #505050; color: #ff9f0a; }
+.btn-eq    { background: #ff9f0a; color: #fff; }
+.btn-clear { background: #505050; color: #ff453a; }
+.btn-zero  { grid-column: span 2; }

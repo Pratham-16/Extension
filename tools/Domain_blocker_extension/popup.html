@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Domain Blocker</title>
+  <style>
+    :root {
+      --ink: #1b1f24;
+      --muted: #6b7280;
+      --border: #e3e5e8;
+      --accent: #2554c7;
+      --accent-hover: #1d44a8;
+      --danger: #c0392b;
+      --danger-hover: #a52f24;
+      --bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      width: 320px;
+      padding: 14px 16px 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    h1 {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      margin: 0 0 12px;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      padding: 7px 9px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    input[type="text"]:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+      border-color: var(--accent);
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    #addBtn {
+      padding: 7px 12px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    #addBtn:hover { background: var(--accent-hover); }
+
+    .upload-row {
+      margin-bottom: 12px;
+    }
+
+    #manageBtn {
+      width: 100%;
+      text-align: left;
+      padding: 7px 9px;
+      font-size: 12px;
+      color: var(--accent);
+      background: transparent;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+    }
+
+    #manageBtn:hover {
+      border-color: var(--accent);
+      background: #f3f6fd;
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    ul#domainList {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    li.empty {
+      color: var(--muted);
+      font-style: italic;
+      justify-content: center;
+      padding: 16px 0;
+    }
+
+    li .domain-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-right: 8px;
+    }
+
+    li button.remove {
+      flex-shrink: 0;
+      padding: 4px 8px;
+      font-size: 11px;
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid var(--border);
+    }
+
+    li button.remove:hover {
+      background: var(--danger);
+      color: #fff;
+      border-color: var(--danger);
+    }
+
+    #status {
+      min-height: 14px;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <h1>Domain Blocker</h1>
+
+  <div class="add-row">
+    <input type="text" id="domainInput" placeholder="example.com" aria-label="Domain to block" />
+    <button id="addBtn">Block</button>
+  </div>
+
+  <div class="upload-row">
+    <button id="manageBtn" type="button">Manage full list &amp; import file →</button>
+  </div>
+
+  <div class="list-header">
+    <span>Blocked domains</span>
+    <span id="countLabel">0</span>
+  </div>
+  <ul id="domainList" aria-live="polite"></ul>
+
+  <div id="status" role="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Code & Cookie Auditor</title>
+<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-glyph">&gt;_</span>
+      <span class="brand-text">CODE_&amp;_COOKIE_AUDITOR</span>
+    </div>
+    <button id="scanBtn" class="scan-btn">RUN SCAN</button>
+  </header>
+
+  <div id="status" class="status">Idle. Click RUN SCAN to audit this page.</div>
+
+  <main id="report" class="report hidden">
+
+    <section class="severity-row">
+      <div class="sev-col sev-critical">
+        <h2>CRITICAL</h2>
+        <div id="criticalList" class="finding-list"></div>
+      </div>
+      <div class="sev-col sev-medium">
+        <h2>MEDIUM</h2>
+        <div id="mediumList" class="finding-list"></div>
+      </div>
+      <div class="sev-col sev-low">
+        <h2>LOW</h2>
+        <div id="lowList" class="finding-list"></div>
+      </div>
+    </section>
+
+    <section class="lower-row">
+      <div class="logical-flaws">
+        <h2>LOGICAL FLAWS IN CODE</h2>
+        <div id="logicalList" class="finding-list"></div>
+      </div>
+
+      <div class="cookie-panel">
+        <h2>SENSITIVE COOKIES</h2>
+        <div id="cookieList" class="finding-list"></div>
+      </div>
+    </section>
+
+    <section class="fix-panel">
+      <h2>RECOMMENDED FIX</h2>
+      <div id="fixDetail" class="fix-detail">
+        <p class="fix-placeholder">Click any finding above to see its fix here.</p>
+      </div>
+    </section>
+
+    <section class="scan-meta" id="scanMeta"></section>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>

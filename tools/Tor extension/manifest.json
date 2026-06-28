@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Tor Mode",
+  "version": "1.0.0",
+  "description": "One click to start Tor, switch Firefox's proxy to it, and verify the connection.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tor-mode@b14ckwolf.local",
+      "strict_min_version": "109.0"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": ["nativeMessaging", "proxy", "storage"],
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Tor Mode",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="calc">
+    <div class="screen">
+      <div class="expr" id="expr"></div>
+      <div class="result" id="result">0</div>
+    </div>
+    <div class="grid">
+      <button class="btn-clear" id="ac">AC</button>
+      <button class="btn-op"    id="sign">+/−</button>
+      <button class="btn-op"    id="pct">%</button>
+      <button class="btn-op"    id="div">÷</button>
+
+      <button class="btn-num">7</button>
+      <button class="btn-num">8</button>
+      <button class="btn-num">9</button>
+      <button class="btn-op" id="mul">×</button>
+
+      <button class="btn-num">4</button>
+      <button class="btn-num">5</button>
+      <button class="btn-num">6</button>
+      <button class="btn-op" id="sub">−</button>
+
+      <button class="btn-num">1</button>
+      <button class="btn-num">2</button>
+      <button class="btn-num">3</button>
+      <button class="btn-op" id="add">+</button>
+
+      <button class="btn-num btn-zero">0</button>
+      <button class="btn-num" id="dot">.</button>
+      <button class="btn-eq"  id="eq">=</button>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

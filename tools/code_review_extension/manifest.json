@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "Code & Cookie Auditor",
+  "version": "0.1.0",
+  "description": "Scans page JavaScript for logical security flaws and audits cookies for sensitive/insecure storage.",
+
+  "permissions": [
+    "cookies",
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "code-cookie-auditor@blackshell.local",
+      "strict_min_version": "109.0"
+    }
+  },
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Run security audit on this page"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["analyzer.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
