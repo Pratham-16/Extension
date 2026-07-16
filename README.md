@@ -193,3 +193,110 @@ install.sh            - registers the native messaging host with Firefox
 screenshots/          - README images
 icons/
 ```
+
+
+<h1 align="center">🚫 Domain Blocker</h1>
+
+<p align="center">
+A lightweight browser extension that blocks websites by domain, entirely in-browser, using Manifest V3's <code>declarativeNetRequest</code> API — no root access, no hosts-file editing, no background process required.
+</p>
+
+<p align="center">
+  <img src="screenshots/popup.png" alt="Domain Blocker popup with quick-add field" width="300">
+</p>
+
+## What it does
+
+- Add a domain from the toolbar popup, or from the full **Manage** page
+- Blocking is enforced natively by the browser's network layer — before any DNS lookup happens — so it applies instantly across every resource type (pages, scripts, images, XHR, fonts, etc.), and covers all subdomains automatically
+- Rules persist across browser restarts
+- Optional **administration passcode** — once set, adding *or* removing a domain requires the passcode, so you can't casually undo a block on impulse
+- Bulk import a `.txt` file (one domain per line) to block a whole list at once
+
+<p align="center">
+  <img src="screenshots/manage-empty.png" alt="Manage blocked domains page, empty state" width="480">
+</p>
+
+## Usage
+
+**Quick block** — click the toolbar icon, type a domain, hit **Block**.
+
+**Full management** — click **Manage full list & import file** in the popup (or open `manage.html` directly) to:
+- Set/change/remove the administration passcode
+- Import a `.txt` list of domains in bulk
+- View and remove currently blocked domains
+
+<p align="center">
+  <img src="screenshots/manage-blocked.png" alt="Manage page with domains blocked and a passcode set" width="480">
+</p>
+
+Once a passcode is set, removing a domain asks you to confirm it:
+
+<p align="center">
+  <img src="screenshots/passcode-prompt.png" alt="Security verification modal asking for the administration passcode before removing a domain" width="420">
+</p>
+
+A blocked domain simply won't load — the browser refuses the request before it goes anywhere:
+
+<p align="center">
+  <img src="screenshots/blocked-page.png" alt="Attempting to visit a blocked domain results in the browser's default new tab page instead" width="600">
+</p>
+
+Removing it from the list restores normal access immediately:
+
+<p align="center">
+  <img src="screenshots/allowed-page.png" alt="The same site loading normally after being unblocked" width="500">
+</p>
+
+## Permissions
+
+| Permission | Why |
+|---|---|
+| `declarativeNetRequest` | Enforce domain blocking natively |
+| `storage` | Persist the blocklist and passcode |
+| `host_permissions: <all_urls>` | Needed so blocking rules can apply to any domain you add |
+
+## Installation (Firefox, unpacked)
+
+1. Open `about:debugging#/runtime/this-firefox`
+2. Click **Load Temporary Add-on**
+3. Select `manifest.json` from this folder
+
+(Chromium browsers: `chrome://extensions` → enable Developer Mode → **Load unpacked** → select this folder.)
+
+---
+
+## ⚠️ Limitations
+
+**This only blocks that domain inside the one browser it's installed in.**
+
+- It has no effect on other browsers on the same machine. If Domain Blocker is only installed in Firefox, the same site is still fully reachable from Chrome, Edge, etc. on that same laptop.
+- It even has no effect on a *different browser that also has Domain Blocker installed*, if the block wasn't separately configured there too — each browser keeps its own extension storage and its own set of `declarativeNetRequest` rules. A blocklist set in one browser's copy of the extension does not carry over to another browser's copy.
+- Anyone with access to the machine can simply open an unrestricted browser (or a fresh profile) and reach the site — this tool is a per-browser convenience blocker, not a system-wide restriction.
+
+### If you actually need a system-wide, browser-independent block
+
+Use the OS-level hosts file instead — this blocks the domain for **every browser and every application** on the machine, regardless of extensions:
+
+```bash
+sudo nano /etc/hosts
+```
+
+Add a line like:
+
+```
+127.0.0.1 example.com
+```
+
+This redirects all requests for that domain on this machine to localhost, so nothing can reach it — no extension, browser setting, or "just open a different browser" workaround gets around it. (You'll want a line per domain, and per `www.` subdomain if the site uses one, e.g. both `example.com` and `www.example.com`.)
+
+## Project structure
+
+```
+manifest.json   - MV3 manifest, permissions
+background.js   - rebuilds declarativeNetRequest rules from storage
+popup.html/.js  - quick add/view UI
+manage.html/.js - full blocklist management UI (passcode, bulk import)
+screenshots/    - README images
+icons/
+```
