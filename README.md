@@ -81,3 +81,115 @@ popup.html/.js/.css  - UI
 screenshots/          - README images
 icons/
 ```
+
+
+<h1 align="center">🧅 Tor Mode</h1>
+
+<p align="center">
+A Firefox extension that switches your browser onto an already-installed Tor service with one toolbar toggle — starting the service, routing traffic through it, and verifying the connection.
+</p>
+
+<p align="center">
+  <img src="screenshots/toggle-off.png" alt="Tor Mode popup with tunneling off" width="260">
+  &nbsp;&nbsp;&nbsp;
+  <img src="screenshots/toggle-on.png" alt="Tor Mode popup with tunneling on, showing exit IP and location" width="260">
+</p>
+
+> ⚠️ **Disclaimer**
+>
+> **Tor Mode does not install Tor.** It is a *switch*, not an *installer* — it assumes the `tor` service is already installed on your system and manageable via `systemctl`. All this extension does is start/stop that pre-existing service and point Firefox's proxy at it. If `tor` isn't installed on your machine, install it first through your OS's package manager (e.g. `sudo apt install tor`) — Tor Mode will have nothing to switch on otherwise.
+>
+> It also controls your system's Tor service and browser proxy settings directly via `sudo`/`pkexec`. Review `tor_mode_host.py` before installing if you want to confirm exactly what it runs on your behalf.
+
+---
+
+## What it does
+
+Click the toggle and Tor Mode will:
+
+1. Start the local `tor` systemd service (if it isn't already running)
+2. Wait for the SOCKS5 port (`127.0.0.1:9050`) to come up
+3. Verify you're actually exiting through Tor via `check.torproject.org`
+4. Switch Firefox's proxy settings to route through that SOCKS port, with DNS resolution also going through Tor to avoid DNS leaks
+5. Show you the exit IP and its approximate location
+
+Switching it off stops the Tor service and restores your normal proxy settings.
+
+Because starting/stopping a system service and shelling out to `curl` aren't things a sandboxed browser extension can do on its own, the heavy lifting is handled by a small native messaging host (`tor_mode_host.py`) that the extension talks to over stdin/stdout — which is also why the OS may prompt you to authenticate:
+
+<p align="center">
+  <img src="screenshots/pkexec-auth.png" alt="System authentication prompt to run systemctl start tor as superuser" width="420">
+</p>
+
+## Architecture
+
+```
+popup.js  →  background.js  →  native messaging  →  tor_mode_host.py  →  systemctl / curl
+   (UI)      (proxy control)                          (privileged work)
+```
+
+- **`popup.js` / `popup.html`** — the toolbar UI. Purely reflects extension storage state; does no work itself.
+- **`background.js`** — owns the connection to the native host and flips `browser.proxy.settings` (or `chrome.proxy.settings` on Chromium) once the host confirms Tor is up.
+- **`tor_mode_host.py`** — native messaging host. Starts/stops the **pre-installed** `tor` service via `sudo -n` (falling back to `pkexec`), polls the SOCKS port, and verifies the exit node.
+- **`install.sh`** — registers the native host with Firefox so the extension is allowed to launch it.
+
+## Requirements
+
+- Firefox 109+
+- **`tor` already installed** and available as a systemd service (`systemctl start/stop tor`) — Tor Mode does not install this for you
+- `curl` (used for the exit-node and geolocation checks)
+- Either passwordless `sudo` configured for `systemctl start tor` / `systemctl stop tor`, or `pkexec`/polkit available for a graphical privilege prompt
+
+## Installation
+
+1. Load the extension in Firefox via `about:debugging` → **This Firefox** → **Load Temporary Add-on** → select `manifest.json` (or install the packaged `.xpi`).
+2. Register the native messaging host — this step is required separately from loading the extension, since the host script lives outside the browser sandbox:
+   ```bash
+   ./install.sh
+   ```
+   This writes `~/.mozilla/native-messaging-hosts/com.b14ckwolf.tormode.json`, pointing at `tor_mode_host.py`'s location at the time you ran the script. If you move the script afterward, edit the `path` field in that JSON file to match, and use a path without spaces to avoid native-messaging quirks.
+3. Reload the extension and click the toolbar icon to toggle Tor on.
+
+## Permissions
+
+- `nativeMessaging` — to talk to `tor_mode_host.py`
+- `proxy` — to set Firefox's SOCKS proxy
+- `storage` — to persist and broadcast connection status to the popup
+
+If proxy switching fails with a "private browsing permission" error, go to `about:addons` → Tor Mode → set **Run in Private Windows** to **Allow**.
+
+## Verifying it's working
+
+The popup shows four live status checks — Tor service, SOCKS port, exit-node verification, DNS — plus the detected exit IP and location once connected. You can also manually verify via the buttons in the popup:
+
+<p align="center">
+  <img src="screenshots/check-torproject.png" alt="check.torproject.org confirming the browser is configured to use Tor" width="500">
+</p>
+
+<p align="center">
+  <img src="screenshots/dnsleaktest.png" alt="dnsleaktest.com showing the Tor exit IP and location" width="500">
+</p>
+
+- [check.torproject.org](https://check.torproject.org/) — confirms your traffic is exiting through Tor
+- [dnsleaktest.com](https://dnsleaktest.com/) — confirms DNS requests aren't leaking outside the tunnel
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| "Couldn't reach the native host" | `install.sh` wasn't run, or the `path` in `com.b14ckwolf.tormode.json` doesn't point to where `tor_mode_host.py` actually lives |
+| "Could not start the Tor service" | `tor` isn't installed, or there's no passwordless sudo for `systemctl start/stop tor` and `pkexec`/polkit isn't available (common on headless or SSH-only setups) |
+| "Tor service is active but the SOCKS port never opened" | Check `SocksPort` in `/etc/tor/torrc` — it should be `9050` |
+| Toggle succeeds but Firefox's proxy settings never change | Check "Run in Private Windows" permission, and confirm `network.proxy.type` isn't locked by another extension or policy in `about:config` |
+
+## Project structure
+
+```
+manifest.json        - extension manifest, permissions
+background.js        - native messaging + proxy control logic
+popup.html/.js        - UI, status display
+tor_mode_host.py      - native messaging host (Tor service control, verification)
+install.sh            - registers the native messaging host with Firefox
+screenshots/          - README images
+icons/
+```
